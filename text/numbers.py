@@ -1,10 +1,10 @@
 """ from https://github.com/keithito/tacotron """
 
-import inflect
+import num2words
 import re
 
 
-_inflect = inflect.engine()
+_inflect = num2words
 _comma_number_re = re.compile(r'([0-9][0-9\,]+[0-9])')
 _decimal_number_re = re.compile(r'([0-9]+\.[0-9]+)')
 _pounds_re = re.compile(r'£([0-9\,]*[0-9]+)')
@@ -14,18 +14,18 @@ _number_re = re.compile(r'[0-9]+')
 
 
 def _remove_commas(m):
-  return m.group(1).replace(',', '')
+  return m.group(1).replace('.', '')
 
 
 def _expand_decimal_point(m):
-  return m.group(1).replace('.', ' point ')
+  return m.group(1).replace(',', ' запятая ')
 
 
 def _expand_dollars(m):
   match = m.group(1)
-  parts = match.split('.')
+  parts = match.split(',')
   if len(parts) > 2:
-    return match + ' dollars'  # Unexpected format
+    return match + ' рублей '  # Unexpected format
   dollars = int(parts[0]) if parts[0] else 0
   cents = int(parts[1]) if len(parts) > 1 and parts[1] else 0
   if dollars and cents:
@@ -43,7 +43,7 @@ def _expand_dollars(m):
 
 
 def _expand_ordinal(m):
-  return _inflect.number_to_words(m.group(0))
+  return num2words(m.group(0), lang='ru')
 
 
 def _expand_number(m):
